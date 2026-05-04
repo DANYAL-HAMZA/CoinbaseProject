@@ -11,7 +11,7 @@ This repo is configured for a Render blueprint deploy:
 Set these Render environment values for the API service:
 
 - `WEB3J_PROVIDER_URL`
-- `WALLET_PRIVATE_KEY`
+- `WALLET_PRIVATE_KEY`: paste only the wallet private key as 64 hexadecimal characters, optionally prefixed with `0x`. Do not paste `${WALLET_PRIVATE_KEY:...}`, braces, quotes, or a trailing `}`.
 - `WALLET_MASTER_MNEMONIC`
 - `WALLET_MASTER_PASSWORD` if you use one
 
