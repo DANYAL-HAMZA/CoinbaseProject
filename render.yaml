@@ -6,7 +6,7 @@ databases:
 
 services:
   - type: web
-    name: coinbaseclone-api
+    name: AbuMalik-Crypto-app-api
     runtime: docker
     rootDir: CoinbaseClone
     dockerfilePath: ./Dockerfile
@@ -41,7 +41,7 @@ services:
         value: platform@exchange.local
 
   - type: web
-    name: coinbaseclone-frontend
+    name: AbuMalik-Crypto-app-frontend
     runtime: static
     rootDir: Frontend
     buildCommand: npm ci && npm run build
