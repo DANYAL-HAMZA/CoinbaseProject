@@ -83,6 +83,12 @@ public class TokenController {
         return ResponseEntity.ok(tokens);
     }
 
+    @GetMapping("/addresses")
+    public ResponseEntity<Map<String, String>> getTokenAddresses() {
+        Map<String, String> addresses = tokenRegistry.getAllActiveTokenAddresses();
+        return ResponseEntity.ok(addresses);
+    }
+
     @GetMapping("/{symbol}")
     public ResponseEntity<Token> getTokenBySymbol(@PathVariable String symbol) {
         Token token = tokenRegistry.getTokenInfo(symbol);
@@ -90,12 +96,6 @@ public class TokenController {
             return ResponseEntity.ok(token);
         }
         return ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/addresses")
-    public ResponseEntity<Map<String, String>> getTokenAddresses() {
-        Map<String, String> addresses = tokenRegistry.getAllActiveTokenAddresses();
-        return ResponseEntity.ok(addresses);
     }
 
     @DeleteMapping("/{tokenId}")

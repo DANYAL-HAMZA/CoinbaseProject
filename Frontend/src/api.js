@@ -191,7 +191,7 @@ export const api = {
   getAllTokens: (token) => request("/api/admin/tokens", { token }),
   getActiveTokens: (token) => request("/api/admin/tokens/active", { token }),
   getTokenBySymbol: (symbol, token) =>
-    request(`/api/admin/tokens/${symbol}`, { token }),
+    request(`/api/admin/tokens/${encodeURIComponent(symbol)}`, { token }),
   getTokenAddresses: (token) =>
     request("/api/admin/tokens/addresses", { token }),
   deleteToken: (tokenId, token) =>

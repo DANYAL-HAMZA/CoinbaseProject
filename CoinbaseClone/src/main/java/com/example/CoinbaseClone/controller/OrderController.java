@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.web3j.protocol.core.RemoteFunctionCall;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -162,8 +161,8 @@ public class OrderController {
 
     @GetMapping("getTokenName")
 
-    public RemoteFunctionCall<String> getTokenName(String contractAddress) throws Exception {
-        return orderService.getTokenName(contractAddress);
+    public String getTokenName(String contractAddress) throws Exception {
+        return orderService.getTokenName(contractAddress).send();
     }
 @GetMapping("getTokenSymbol")
     public String getTokenSymbol(String contractAddress) throws Exception {

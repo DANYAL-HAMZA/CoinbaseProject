@@ -772,6 +772,8 @@ function DashboardPage({ authState, setAuthState }) {
     setTokenError("");
     setTokenStatus("");
     try {
+      const shouldRefreshTokenLists = ["add", "update", "activate", "deactivate", "delete", "refresh"].includes(type);
+
       if (type === "add") {
         await api.addToken(tokenAdd, authState.token);
         setTokenStatus("Token added.");
@@ -791,18 +793,40 @@ function DashboardPage({ authState, setAuthState }) {
       if (type === "activate") await api.activateToken(tokenUpdate.tokenId, authState.token);
       if (type === "deactivate") await api.deactivateToken(tokenUpdate.tokenId, authState.token);
       if (type === "delete") await api.deleteToken(tokenUpdate.tokenId, authState.token);
-      if (type === "detail") setTokenDetail(await api.getTokenBySymbol(tokenQuery.symbol, authState.token));
+      if (type === "detail") {
+        if (!tokenQuery.symbol.trim()) throw new Error("Symbol is required.");
+        setTokenDetail(await api.getTokenBySymbol(tokenQuery.symbol.trim(), authState.token));
+        setTokenStatus(`Loaded token ${tokenQuery.symbol.trim().toUpperCase()}.`);
+      }
       if (type === "name") {
-        const name = await api.getTokenName(tokenQuery.contractAddress, authState.token);
+        if (!tokenQuery.contractAddress.trim()) throw new Error("Contract address is required.");
+        const name = await api.getTokenName(tokenQuery.contractAddress.trim(), authState.token);
         setTokenMeta((s) => ({ ...s, name }));
+        setTokenStatus("Loaded token name.");
       }
       if (type === "symbol") {
-        const symbol = await api.getTokenSymbol(tokenQuery.contractAddress, authState.token);
+        if (!tokenQuery.contractAddress.trim()) throw new Error("Contract address is required.");
+        const symbol = await api.getTokenSymbol(tokenQuery.contractAddress.trim(), authState.token);
         setTokenMeta((s) => ({ ...s, symbol }));
+        setTokenStatus("Loaded token symbol.");
       }
       if (type === "refresh") await api.refreshTokenCache(authState.token);
+      if (type === "loadAll") {
+        await loadAllTokens();
+        setTokenStatus("Loaded all tokens.");
+      }
+      if (type === "loadActive") {
+        await loadActiveTokens();
+        setTokenStatus("Loaded active tokens.");
+      }
+      if (type === "loadAddresses") {
+        await loadAddresses();
+        setTokenStatus("Loaded token addresses.");
+      }
 
-      await Promise.all([loadAllTokens(), loadActiveTokens(), loadAddresses()]);
+      if (shouldRefreshTokenLists) {
+        await Promise.all([loadAllTokens(), loadActiveTokens(), loadAddresses()]);
+      }
       if (["activate", "deactivate", "delete", "refresh"].includes(type)) setTokenStatus(`Token action ${type} completed.`);
     } catch (err) {
       setTokenError(getErrorMessage(err));
@@ -1160,9 +1184,9 @@ function DashboardPage({ authState, setAuthState }) {
             </div>
           </div>
           <div className="button-row spaced-row">
-            <button className="secondary-button" onClick={loadAllTokens} type="button">Load all</button>
-            <button className="secondary-button" onClick={loadActiveTokens} type="button">Load active</button>
-            <button className="secondary-button" onClick={loadAddresses} type="button">Load addresses</button>
+            <button className="secondary-button" onClick={() => tokenAction("loadAll")} type="button">Load all</button>
+            <button className="secondary-button" onClick={() => tokenAction("loadActive")} type="button">Load active</button>
+            <button className="secondary-button" onClick={() => tokenAction("loadAddresses")} type="button">Load addresses</button>
           </div>
           <div className="split-layout">
             <div className="code-panel"><pre>{tokenDetail ? JSON.stringify(tokenDetail, null, 2) : "No token loaded."}</pre></div>
