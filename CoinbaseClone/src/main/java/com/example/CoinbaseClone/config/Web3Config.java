@@ -7,9 +7,13 @@ import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 @Configuration
 public class Web3Config {
     private static final String PRIVATE_KEY_PATTERN = "^[0-9a-fA-F]{64}$";
+    private static final String DEFAULT_PROVIDER_URL = "https://sepolia.gateway.tenderly.co/6VnYb8FKynzGGiSo1aIjZn";
 
     @Value("${web3j.provider.url}")
     private String clientAddress;
@@ -19,7 +23,7 @@ public class Web3Config {
 
     @Bean
     public Web3j web3j() {
-        return Web3j.build(new HttpService(clientAddress));
+        return Web3j.build(new HttpService(normalizeProviderUrl(clientAddress)));
     }
 
     @Bean
@@ -44,5 +48,30 @@ public class Web3Config {
         }
 
         return normalizedPrivateKey;
+    }
+
+    static String normalizeProviderUrl(String configuredProviderUrl) {
+        String normalizedProviderUrl = configuredProviderUrl == null ? "" : configuredProviderUrl.trim();
+        if (normalizedProviderUrl.isBlank() || "null".equalsIgnoreCase(normalizedProviderUrl)) {
+            normalizedProviderUrl = DEFAULT_PROVIDER_URL;
+        }
+
+        URI providerUri;
+        try {
+            providerUri = new URI(normalizedProviderUrl);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("WEB3J_PROVIDER_URL must be a valid HTTP or HTTPS RPC URL.", e);
+        }
+
+        String scheme = providerUri.getScheme();
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new IllegalArgumentException("WEB3J_PROVIDER_URL must start with http:// or https://.");
+        }
+
+        if (providerUri.getHost() == null || providerUri.getHost().isBlank()) {
+            throw new IllegalArgumentException("WEB3J_PROVIDER_URL must include a host name.");
+        }
+
+        return normalizedProviderUrl;
     }
 }
