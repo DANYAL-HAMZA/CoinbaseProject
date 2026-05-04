@@ -470,7 +470,7 @@ function DashboardPage({ authState, setAuthState }) {
   const [orderError, setOrderError] = useState("");
 
   const [tokenAdd, setTokenAdd] = useState({ symbol: "", name: "", contractAddress: "", decimals: "18" });
-  const [tokenUpdate, setTokenUpdate] = useState({ tokenId: "", name: "", contractAddress: "", decimals: "", isActive: "" });
+  const [tokenUpdate, setTokenUpdate] = useState({ tokenId: "", symbol: "", name: "", contractAddress: "", decimals: "", isActive: "" });
   const [tokenQuery, setTokenQuery] = useState({ symbol: "", contractAddress: "" });
   const [allTokens, setAllTokens] = useState([]);
   const [activeTokens, setActiveTokens] = useState([]);
@@ -779,12 +779,14 @@ function DashboardPage({ authState, setAuthState }) {
       }
       if (type === "update") {
         await api.updateToken(tokenUpdate.tokenId, {
+          symbol: tokenUpdate.symbol || undefined,
           name: tokenUpdate.name || undefined,
           contractAddress: tokenUpdate.contractAddress || undefined,
           decimals: tokenUpdate.decimals || undefined,
           isActive: tokenUpdate.isActive === "" ? undefined : tokenUpdate.isActive === "true",
         }, authState.token);
         setTokenStatus("Token updated.");
+        setTokenUpdate({ tokenId: "", symbol: "", name: "", contractAddress: "", decimals: "", isActive: "" });
       }
       if (type === "activate") await api.activateToken(tokenUpdate.tokenId, authState.token);
       if (type === "deactivate") await api.deactivateToken(tokenUpdate.tokenId, authState.token);
@@ -1128,6 +1130,7 @@ function DashboardPage({ authState, setAuthState }) {
             <form className="form-grid" onSubmit={(e) => tokenAction("update", e)}>
               <h3>Update token</h3>
               <Field label="Token ID"><input value={tokenUpdate.tokenId} onChange={(e) => setTokenUpdate((s) => ({ ...s, tokenId: e.target.value }))} /></Field>
+              <Field label="Symbol"><input value={tokenUpdate.symbol} onChange={(e) => setTokenUpdate((s) => ({ ...s, symbol: e.target.value }))} /></Field>
               <Field label="Name"><input value={tokenUpdate.name} onChange={(e) => setTokenUpdate((s) => ({ ...s, name: e.target.value }))} /></Field>
               <Field label="Contract"><input value={tokenUpdate.contractAddress} onChange={(e) => setTokenUpdate((s) => ({ ...s, contractAddress: e.target.value }))} /></Field>
               <Field label="Decimals"><input value={tokenUpdate.decimals} onChange={(e) => setTokenUpdate((s) => ({ ...s, decimals: e.target.value }))} /></Field>
